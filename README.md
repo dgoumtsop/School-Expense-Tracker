@@ -1,36 +1,34 @@
-# School-Expense-Tracker
 # School Expense Manager
 
-Expense management system for a school: budgets per category, daily expense entry, and financial reports for the management board. Currency is FCFA. The UI is in French.
+Expense management web app for a school: budgets per category, daily expense entry, and financial reports for the management board. Amounts are in FCFA and the UI is in English.
 
 > Status: in development. Built from the client spec (`Depenses_description.pdf`).
 
-## Modules
+## Features
 
-### I. Configuration, categories and budget
+### Configuration, categories and budget
 - School years: define the active year (e.g. 2026-2027) to separate expenses by year
-- Expense categories: create, edit and delete categories
+- Expense categories: create, edit and archive
 - Budget allocation: set a maximum budget per category (monthly, quarterly or yearly)
 - Budget vs actual: visual indicator (color and percentage) of budget consumption
-- Overspend alerts: warn or block when an expense exceeds the allocated budget
-- Accounts / cash boxes: main cash box, bank account, mobile money
+- Overspend alerts: warning as a budget nears its limit, confirmation before going over
+- Accounts: main cash box, bank account, mobile money
 - Payment methods: cash, bank transfer, cheque, mobile money
 - Suppliers: register regular providers (bookshops, energy suppliers, craftsmen)
 
-### II. Operations and expense entry
-- New expense: date, amount, category, payment method, account, description
-- Add, edit and delete expense lines
-- Transaction history: editable list of all expenses
+### Expense entry
+- New expense: date, amount, category, payment method, account, supplier, description
+- Add, edit and cancel expenses (cancelled expenses stay in history and are excluded from totals)
+- Transaction history with filters
 
-### III. Analysis and reporting
-- Dashboard: monthly expense chart and breakdown by category
-- Periodic statements: daily, monthly, yearly, printable
-- Statements by payment method
-- Statements by expense category
+### Reports
+- Dashboard: monthly spending and breakdown by category
+- Periodic statements: daily, monthly, yearly
+- Statements by payment method and by category
 - Budget vs expenses statement
-- Export to PDF and Excel/CSV, plus printing
+- CSV export, print view and PDF (via print)
 
-## Initial categories
+## Initial categories (2026-2027)
 
 | Category | Monthly (FCFA) | Count | Annual total (FCFA) |
 |---|---:|---:|---:|
@@ -48,17 +46,31 @@ Expense management system for a school: budgets per category, daily expense entr
 
 ## Tech stack
 
-TBD
+- Next.js (App Router), TypeScript, Tailwind CSS
+- PostgreSQL with Prisma
+- Auth.js (single admin login)
+- Zod for validation, Recharts for charts, Vitest for tests
+- Hosting: Vercel + managed Postgres with automated backups
+
+## Design decisions
+
+- Money is stored as integer FCFA 
+- Budget consumption is computed from expenses, never stored
+- Expenses are cancelled, not deleted, to keep financial history
 
 ## Getting started
 
-TBD
+Setup instructions will be added once the project is scaffolded.
 
 ## Roadmap
 
-- [ ] Data model (school year, category, budget, account, payment method, supplier, expense)
-- [ ] Configuration screens
-- [ ] Expense entry and history
-- [ ] Budget vs actual indicators and overspend alerts
-- [ ] Dashboard
-- [ ] Reports, print, PDF and CSV export
+- [ ] Phase 0: repo, scaffold, schema, hello-world deploy
+- [ ] Phase 1: login, layout, seed data
+- [ ] Phase 2: configuration screens
+- [ ] Phase 3: expense entry, budget engine, alerts
+- [ ] Phase 4: dashboard and reports, CSV and print
+- [ ] Phase 5: tests, empty/error states, user guide, release
+
+## Not in V1
+
+Multiple users and roles, income tracking, payroll, accounting ledgers, mobile app, receipt uploads.
