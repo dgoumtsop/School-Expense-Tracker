@@ -8,7 +8,7 @@ Expense management web app for a school: budgets per category, daily expense ent
 
 ### Configuration, categories and budget
 - School years: define the active year (e.g. 2026-2027) to separate expenses by year
-- Expense categories: create, edit and archive
+- Expense categories: fully user-defined; create, edit and archive any category
 - Budget allocation: set a maximum budget per category (monthly, quarterly or yearly)
 - Budget vs actual: visual indicator (color and percentage) of budget consumption
 - Overspend alerts: warning as a budget nears its limit, confirmation before going over
@@ -28,7 +28,9 @@ Expense management web app for a school: budgets per category, daily expense ent
 - Budget vs expenses statement
 - CSV export, print view and PDF (via print)
 
-## Initial categories (2026-2027)
+## Example categories (2026-2027)
+
+These come from the client spec and are only a sample of what the school tracks. Categories and budgets are fully user-defined, so this list is not fixed. It is loaded as optional starter data.
 
 | Category | Monthly (FCFA) | Count | Annual total (FCFA) |
 |---|---:|---:|---:|
@@ -54,7 +56,7 @@ Expense management web app for a school: budgets per category, daily expense ent
 
 ## Design decisions
 
-- Money is stored as integer FCFA 
+- Money is stored as integer FCFA (no decimals)
 - Budget consumption is computed from expenses, never stored
 - Expenses are cancelled, not deleted, to keep financial history
 
