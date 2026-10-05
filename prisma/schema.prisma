@@ -11,3 +11,47 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model SchoolYear {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  isActive  Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  budgets   Budget[]
+  expenses  Expense[]
+}
+
+model Category {
+  id         Int       @id @default(autoincrement())
+  name       String    @unique
+  isArchived Boolean   @default(false)
+  createdAt  DateTime  @default(now())
+  budgets    Budget[]
+  expenses   Expense[]
+}
+
+model Budget {
+  id           Int      @id @default(autoincrement())
+  amount       Int
+  categoryId   Int
+  schoolYearId Int
+  createdAt    DateTime @default(now())
+
+  category   Category   @relation(fields: [categoryId], references: [id])
+  schoolYear SchoolYear @relation(fields: [schoolYearId], references: [id])
+
+  @@unique([categoryId, schoolYearId])
+}
+
+model Expense {
+  id           Int      @id @default(autoincrement())
+  date         DateTime
+  amount       Int
+  description  String?
+  categoryId   Int
+  schoolYearId Int
+  createdAt    DateTime @default(now())
+
+  category   Category   @relation(fields: [categoryId], references: [id])
+  schoolYear SchoolYear @relation(fields: [schoolYearId], references: [id])
+}
