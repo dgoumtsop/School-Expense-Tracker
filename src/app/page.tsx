@@ -7,6 +7,7 @@ export default function Home() {
       <Link href="/" className="underline block mb-4">← Home</Link>
       <nav className="flex flex-col gap-2">
         <Link href="/budgets" className="underline">Budgets</Link>
+        <Link href="/categories" className="underline">Categories</Link>
       </nav>
     </main>
   );
