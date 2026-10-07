@@ -43,15 +43,52 @@ model Budget {
   @@unique([categoryId, schoolYearId])
 }
 
+enum PaymentMethod {
+  CASH
+  BANK_TRANSFER
+  CHEQUE
+  MOBILE_MONEY
+}
+
+enum ExpenseStatus {
+  ACTIVE
+  CANCELLED
+}
+
+model Account {
+  id         Int      @id @default(autoincrement())
+  name       String   @unique
+  isArchived Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  expenses Expense[]
+}
+
+model Supplier {
+  id         Int      @id @default(autoincrement())
+  name       String   @unique
+  isArchived Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  expenses Expense[]
+}
+
 model Expense {
-  id           Int      @id @default(autoincrement())
-  date         DateTime
-  amount       Int
-  description  String?
-  categoryId   Int
-  schoolYearId Int
-  createdAt    DateTime @default(now())
+  id            Int           @id @default(autoincrement())
+  date          DateTime
+  amount        Int
+  description   String?
+  paymentMethod PaymentMethod
+  status        ExpenseStatus @default(ACTIVE)
+  cancelledAt   DateTime?
+  categoryId    Int
+  schoolYearId  Int
+  accountId     Int
+  supplierId    Int?
+  createdAt     DateTime      @default(now())
 
   category   Category   @relation(fields: [categoryId], references: [id])
   schoolYear SchoolYear @relation(fields: [schoolYearId], references: [id])
+  account    Account    @relation(fields: [accountId], references: [id])
+  supplier   Supplier?  @relation(fields: [supplierId], references: [id])
 }
