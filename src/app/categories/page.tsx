@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { createCategory, archiveCategory } from "./actions";
 import { prisma } from "@/lib/prisma";
-import { createCategory } from "./actions";
 
 export const dynamic = "force-dynamic";
 
