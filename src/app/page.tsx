@@ -9,6 +9,7 @@ export default function Home() {
         <Link href="/categories" className="underline">Categories</Link>
         <Link href="/budgets" className="underline">Budgets</Link>
         <Link href="/accounts" className="underline">Accounts</Link>
+        <Link href="/expenses" className="underline">Expenses</Link>
       </nav>
     </main>
   );
