@@ -2,26 +2,27 @@
 
 Expense management web app for a school: budgets per category, daily expense entry, and financial reports for the management board. Amounts are in FCFA and the UI is in English.
 
-> Status: in development. Built from the client spec (`Depenses_description.pdf`).
+> Status: in development. Built from the client spec (`Depenses_description.pdf`). Configuration and expense entry work; reports, design pass, login and deployment are next.
 
 ## Features
 
 ### Configuration, categories and budget
 - School years: define the active year (e.g. 2026-2027) to separate expenses by year
-- Expense categories: fully user-defined; create, edit and archive any category
-- Budget allocation: set a maximum budget per category (monthly, quarterly or yearly)
-- Budget vs actual: visual indicator (color and percentage) of budget consumption
-- Overspend alerts: warning as a budget nears its limit, confirmation before going over
+- Expense categories: fully user-defined; create and archive any category
+- Budget allocation: set a maximum budget per category for the active school year
+- Budget vs actual: spent amount and percentage per category, with warning (80%) and over-budget (100%) levels
+- Overspend alerts: heads-up after saving at 80%, confirmation required before going over 100%
 - Accounts: main cash box, bank account, mobile money
 - Payment methods: cash, bank transfer, cheque, mobile money
 - Suppliers: register regular providers (bookshops, energy suppliers, craftsmen)
 
 ### Expense entry
 - New expense: date, amount, category, payment method, account, supplier, description
-- Add, edit and cancel expenses (cancelled expenses stay in history and are excluded from totals)
-- Transaction history with filters
+- Edit and cancel expenses (cancelled expenses stay in history and are excluded from totals)
+- Transaction history with filters: date range, category, payment method, status
+- Spending in categories with no budget is shown on the budgets page
 
-### Reports
+### Reports (planned)
 - Dashboard: monthly spending and breakdown by category
 - Periodic statements: daily, monthly, yearly
 - Statements by payment method and by category
@@ -30,7 +31,7 @@ Expense management web app for a school: budgets per category, daily expense ent
 
 ## Example categories (2026-2027)
 
-These come from the client spec and are only a sample of what the school tracks. Categories and budgets are fully user-defined, so this list is not fixed. It is loaded as optional starter data.
+These come from the client spec and are only a sample of what the school tracks. Categories and budgets are fully user-defined, so this list is not fixed. The seed script loads a few of them as optional starter data.
 
 | Category | Monthly (FCFA) | Count | Annual total (FCFA) |
 |---|---:|---:|---:|
@@ -49,29 +50,64 @@ These come from the client spec and are only a sample of what the school tracks.
 ## Tech stack
 
 - Next.js (App Router), TypeScript, Tailwind CSS
-- PostgreSQL with Prisma
-- Auth.js (single admin login)
-- Zod for validation, Recharts for charts, Vitest for tests
-- Hosting: Vercel + managed Postgres with automated backups
+- PostgreSQL with Prisma 7 (driver adapter `@prisma/adapter-pg`)
+- Server components and server actions for data access and forms
+- Planned: Recharts for charts, Auth.js for a single admin login, Vitest for the budget logic tests
+- Planned hosting: Vercel + managed Postgres with automated backups
 
 ## Design decisions
 
 - Money is stored as integer FCFA (no decimals)
 - Budget consumption is computed from expenses, never stored
 - Expenses are cancelled, not deleted, to keep financial history
+- Categories, accounts and suppliers are archived, not deleted, so old expenses keep their references
+- Only one school year is active at a time; switching it is a single transaction
 
 ## Getting started
 
-Setup instructions will be added once the project is scaffolded.
+Requirements: Node.js 20+, Docker Desktop.
+
+```bash
+git clone https://github.com/dgoumtsop/School-Expense-Tracker.git
+cd School-Expense-Tracker
+npm install
+```
+
+Create a `.env` file in the project root (it is git-ignored):
+
+```text
+DATABASE_URL="postgresql://expense:expense@localhost:5432/expense_tracker?schema=public"
+```
+
+Start the database, create the tables, generate the Prisma client, and run the app:
+
+```bash
+docker compose up -d
+npx prisma migrate deploy
+npx prisma generate
+npx tsx prisma/seed.ts   # optional: sample school year, categories and budgets
+npm run dev
+```
+
+Open http://localhost:3000. If the app says it can't reach the database, make sure Docker Desktop is running and `docker compose up -d` has been run.
+
+## Project structure
+
+```
+prisma/        schema, migrations, seed script
+src/lib/       prisma client, budget check, payment methods, form state type
+src/app/       one folder per page (school-years, categories, budgets,
+               accounts, suppliers, expenses); each has page.tsx and actions.ts
+```
 
 ## Roadmap
 
-- [ ] Phase 0: repo, scaffold, schema, hello-world deploy
-- [ ] Phase 1: login, layout, seed data
-- [ ] Phase 2: configuration screens
-- [ ] Phase 3: expense entry, budget engine, alerts
-- [ ] Phase 4: dashboard and reports, CSV and print
-- [ ] Phase 5: tests, empty/error states, user guide, release
+- [x] Setup: repo, Next.js, local Postgres, Prisma schema, seed data
+- [x] Configuration screens: school years, categories, budgets, accounts, suppliers
+- [x] Expenses: entry, edit, cancel, history filters, budget check
+- [ ] Design pass: app shell, tables, progress bars, mobile layout
+- [ ] Reports: dashboard, statements, CSV export, print
+- [ ] Login, deployment with backups, tests, user guide
 
 ## Not in V1
 
