@@ -29,6 +29,16 @@ export default async function BudgetsPage() {
     spentRows.map((r) => [r.categoryId, r._sum.amount ?? 0])
   );
 
+  // categories that have spending but no budget row, they'd be invisible otherwise
+  const budgetedIds = new Set(budgets.map((b) => b.categoryId));
+  const unbudgetedRows = spentRows.filter((r) => !budgetedIds.has(r.categoryId));
+  const unbudgetedCategories = unbudgetedRows.length
+    ? await prisma.category.findMany({
+        where: { id: { in: unbudgetedRows.map((r) => r.categoryId) } },
+      })
+    : [];
+  const nameById = new Map(unbudgetedCategories.map((c) => [c.id, c.name]));
+
   return (
     <main className="p-8">
       <Link href="/" className="underline block mb-4">← Home</Link>
@@ -55,32 +65,51 @@ export default async function BudgetsPage() {
         </button>
       </form>
 
-      <ul className="space-y-2">
-        {budgets.map((b) => {
-          const spent = spentByCategory.get(b.categoryId) ?? 0;
-          const percent = Math.round((spent / b.amount) * 100);
+      {budgets.length === 0 ? (
+        <p>No budgets set for the active school year yet.</p>
+      ) : (
+        <ul className="space-y-2">
+          {budgets.map((b) => {
+            const spent = spentByCategory.get(b.categoryId) ?? 0;
+            const percent = Math.round((spent / b.amount) * 100);
 
-          // 80% and up is a warning, 100% and up is over budget
-          const color =
-            percent >= 100
-              ? "text-red-600"
-              : percent >= 80
-                ? "text-yellow-600"
-                : "text-green-700";
-          const label =
-            percent >= 100 ? "Over budget" : percent >= 80 ? "Warning" : "OK";
+            // 80% and up is a warning, 100% and up is over budget
+            const color =
+              percent >= 100
+                ? "text-red-600"
+                : percent >= 80
+                  ? "text-yellow-600"
+                  : "text-green-700";
+            const label =
+              percent >= 100 ? "Over budget" : percent >= 80 ? "Warning" : "OK";
 
-          return (
-            <li key={b.id}>
-              {b.category.name}: {spent.toLocaleString("en-US")} /{" "}
-              {b.amount.toLocaleString("en-US")} FCFA{" "}
-              <span className={color}>
-                ({percent}% · {label})
-              </span>
-            </li>
-          );
-        })}
-      </ul>
+            return (
+              <li key={b.id}>
+                {b.category.name}: {spent.toLocaleString("en-US")} /{" "}
+                {b.amount.toLocaleString("en-US")} FCFA{" "}
+                <span className={color}>
+                  ({percent}% · {label})
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+
+      {unbudgetedRows.length > 0 && (
+        <section className="mt-8">
+          <h2 className="text-xl font-semibold mb-2">Spending with no budget</h2>
+          <ul className="space-y-1">
+            {unbudgetedRows.map((r) => (
+              <li key={r.categoryId}>
+                {nameById.get(r.categoryId) ?? "Unknown category"}:{" "}
+                {(r._sum.amount ?? 0).toLocaleString("en-US")} FCFA{" "}
+                <span className="text-yellow-600">(No budget set)</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
     </main>
   );
 }
