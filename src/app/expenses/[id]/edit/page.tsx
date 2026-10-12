@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { PageHeader } from "@/components/page-header";
+import { isoDate } from "@/lib/format";
 import { updateExpense } from "../../actions";
 import { ExpenseForm } from "../../expense-form";
 
@@ -23,26 +25,33 @@ export default async function EditExpensePage({
   ]);
 
   return (
-    <main className="p-8">
-      <Link href="/expenses" className="underline block mb-4">← Expenses</Link>
-      <h1 className="text-2xl font-bold mb-4">Edit expense</h1>
-      <ExpenseForm
-        action={updateExpense}
-        categories={categories}
-        accounts={accounts}
-        suppliers={suppliers}
-        submitLabel="Save changes"
-        initial={{
-          id: expense.id,
-          date: expense.date.toISOString().slice(0, 10),
-          amount: expense.amount,
-          categoryId: expense.categoryId,
-          accountId: expense.accountId,
-          supplierId: expense.supplierId,
-          paymentMethod: expense.paymentMethod,
-          description: expense.description,
-        }}
+    <>
+      <Link href="/expenses" className="mb-4 inline-block text-sm text-accent hover:underline">
+        Back to expenses
+      </Link>
+      <PageHeader
+        title="Edit expense"
+        description="Changes apply to the budget totals right away."
       />
-    </main>
+      <div className="max-w-3xl">
+        <ExpenseForm
+          action={updateExpense}
+          categories={categories}
+          accounts={accounts}
+          suppliers={suppliers}
+          submitLabel="Save changes"
+          initial={{
+            id: expense.id,
+            date: isoDate(expense.date),
+            amount: expense.amount,
+            categoryId: expense.categoryId,
+            accountId: expense.accountId,
+            supplierId: expense.supplierId,
+            paymentMethod: expense.paymentMethod,
+            description: expense.description,
+          }}
+        />
+      </div>
+    </>
   );
 }

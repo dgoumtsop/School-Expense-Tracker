@@ -52,78 +52,124 @@ export function ExpenseForm({
   }
 
   return (
-    <form ref={formRef} onSubmit={onSubmit} className="grid gap-2 max-w-md mb-8">
+    <form
+      ref={formRef}
+      onSubmit={onSubmit}
+      className="panel grid gap-4 p-5 md:grid-cols-2"
+    >
       {initial?.id ? <input type="hidden" name="id" value={initial.id} /> : null}
 
-      <input
-        name="date"
-        type="date"
-        required
-        defaultValue={initial?.date}
-        className="border rounded px-2 py-1"
-      />
-      <input
-        name="amount"
-        type="number"
-        min="1"
-        required
-        placeholder="Amount (FCFA)"
-        defaultValue={initial?.amount}
-        className="border rounded px-2 py-1"
-      />
-      <select
-        name="categoryId"
-        required
-        defaultValue={initial?.categoryId}
-        className="border rounded px-2 py-1"
-      >
-        {categories.map((c) => (
-          <option key={c.id} value={c.id}>{c.name}</option>
-        ))}
-      </select>
-      <select
-        name="accountId"
-        required
-        defaultValue={initial?.accountId}
-        className="border rounded px-2 py-1"
-      >
-        {accounts.map((a) => (
-          <option key={a.id} value={a.id}>{a.name}</option>
-        ))}
-      </select>
-      <select
-        name="paymentMethod"
-        required
-        defaultValue={initial?.paymentMethod}
-        className="border rounded px-2 py-1"
-      >
-        {PAYMENT_METHODS.map((m) => (
-          <option key={m.value} value={m.value}>{m.label}</option>
-        ))}
-      </select>
-      <select
-        name="supplierId"
-        defaultValue={initial?.supplierId ?? ""}
-        className="border rounded px-2 py-1"
-      >
-        <option value="">No supplier</option>
-        {suppliers.map((s) => (
-          <option key={s.id} value={s.id}>{s.name}</option>
-        ))}
-      </select>
-      <input
-        name="description"
-        placeholder="Description (optional)"
-        defaultValue={initial?.description ?? ""}
-        className="border rounded px-2 py-1"
-      />
+      <div>
+        <label htmlFor="exp-date" className="label">Date</label>
+        <input
+          id="exp-date"
+          name="date"
+          type="date"
+          required
+          defaultValue={initial?.date}
+          className="field"
+        />
+      </div>
+      <div>
+        <label htmlFor="exp-amount" className="label">Amount (FCFA)</label>
+        <input
+          id="exp-amount"
+          name="amount"
+          type="number"
+          min="1"
+          required
+          placeholder="e.g. 50000"
+          defaultValue={initial?.amount}
+          className="field"
+        />
+      </div>
+      <div>
+        <label htmlFor="exp-category" className="label">Category</label>
+        <select
+          id="exp-category"
+          name="categoryId"
+          required
+          defaultValue={initial?.categoryId}
+          className="field"
+        >
+          {categories.map((c) => (
+            <option key={c.id} value={c.id}>{c.name}</option>
+          ))}
+        </select>
+      </div>
+      <div>
+        <label htmlFor="exp-account" className="label">Paid from account</label>
+        <select
+          id="exp-account"
+          name="accountId"
+          required
+          defaultValue={initial?.accountId}
+          className="field"
+        >
+          {accounts.map((a) => (
+            <option key={a.id} value={a.id}>{a.name}</option>
+          ))}
+        </select>
+      </div>
+      <div>
+        <label htmlFor="exp-method" className="label">Payment method</label>
+        <select
+          id="exp-method"
+          name="paymentMethod"
+          required
+          defaultValue={initial?.paymentMethod}
+          className="field"
+        >
+          {PAYMENT_METHODS.map((m) => (
+            <option key={m.value} value={m.value}>{m.label}</option>
+          ))}
+        </select>
+      </div>
+      <div>
+        <label htmlFor="exp-supplier" className="label">Supplier (optional)</label>
+        <select
+          id="exp-supplier"
+          name="supplierId"
+          defaultValue={initial?.supplierId ?? ""}
+          className="field"
+        >
+          <option value="">No supplier</option>
+          {suppliers.map((s) => (
+            <option key={s.id} value={s.id}>{s.name}</option>
+          ))}
+        </select>
+      </div>
+      <div className="md:col-span-2">
+        <label htmlFor="exp-description" className="label">Description (optional)</label>
+        <input
+          id="exp-description"
+          name="description"
+          placeholder="What was this for?"
+          defaultValue={initial?.description ?? ""}
+          className="field"
+        />
+      </div>
 
-      {state.error && <p className="text-red-600">{state.error}</p>}
-      {state.success && <p className="text-green-700">{state.success}</p>}
-      {state.warning && <p className="text-yellow-700">{state.warning}</p>}
+      {(state.error || state.success || state.warning) && (
+        <div className="md:col-span-2" role="status" aria-live="polite">
+          {state.error && (
+            <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-800">{state.error}</p>
+          )}
+          {state.success && (
+            <p className="rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
+              {state.success}
+            </p>
+          )}
+          {state.warning && (
+            <p className="rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-900">
+              {state.warning}
+            </p>
+          )}
+        </div>
+      )}
 
-      <div className="flex gap-2">
-        <button type="submit" disabled={pending} className="border rounded px-3 py-1">
+      <div className="flex flex-wrap gap-2 md:col-span-2">
+        <button type="submit" disabled={pending} className="btn btn-primary">
           {submitLabel}
         </button>
         {state.needsConfirm && (
@@ -132,7 +178,7 @@ export function ExpenseForm({
             name="confirm"
             value="yes"
             disabled={pending}
-            className="border rounded px-3 py-1 text-red-600"
+            className="btn btn-danger"
           >
             Save anyway
           </button>
