@@ -39,8 +39,20 @@ function parseExpense(formData: FormData) {
   };
 }
 
-function overBudgetMessage(impact: { budget: number; spentAfter: number; percent: number }) {
-  return `This puts the category at ${impact.percent}% of its budget (${impact.spentAfter.toLocaleString("en-US")} of ${impact.budget.toLocaleString("en-US")} FCFA).`;
+type Impact = {
+  budget: number;
+  period: "YEARLY" | "MONTHLY";
+  spentAfter: number;
+  percent: number;
+};
+
+// a monthly budget is talked about as monthly, so the message makes sense to the user
+function budgetWord(impact: Impact) {
+  return impact.period === "MONTHLY" ? "its monthly budget" : "its budget";
+}
+
+function overBudgetMessage(impact: Impact) {
+  return `This puts the category at ${impact.percent}% of ${budgetWord(impact)} (${impact.spentAfter.toLocaleString("en-US")} of ${impact.budget.toLocaleString("en-US")} FCFA).`;
 }
 
 export async function createExpense(
@@ -56,7 +68,8 @@ export async function createExpense(
   const impact = await getBudgetImpact(
     parsed.data.categoryId,
     year.id,
-    parsed.data.amount
+    parsed.data.amount,
+    parsed.data.date
   );
 
   // over 100% needs an explicit confirmation from the user
@@ -75,7 +88,7 @@ export async function createExpense(
   // 80% and up is a heads-up after saving
   const heads =
     impact && impact.percent >= 80
-      ? ` Heads up: this category is now at ${impact.percent}% of its budget.`
+      ? ` Heads up: this category is now at ${impact.percent}% of ${budgetWord(impact)}.`
       : "";
   return { success: `Expense added.${heads}` };
 }
@@ -98,6 +111,7 @@ export async function updateExpense(
     parsed.data.categoryId,
     existing.schoolYearId,
     parsed.data.amount,
+    parsed.data.date,
     existing.id
   );
 
