@@ -30,12 +30,18 @@ model Category {
   expenses   Expense[]
 }
 
+enum BudgetPeriod {
+  YEARLY
+  MONTHLY
+}
+
 model Budget {
-  id           Int      @id @default(autoincrement())
+  id           Int          @id @default(autoincrement())
   amount       Int
+  period       BudgetPeriod @default(YEARLY)
   categoryId   Int
   schoolYearId Int
-  createdAt    DateTime @default(now())
+  createdAt    DateTime     @default(now())
 
   category   Category   @relation(fields: [categoryId], references: [id])
   schoolYear SchoolYear @relation(fields: [schoolYearId], references: [id])
