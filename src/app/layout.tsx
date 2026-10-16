@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Sidebar } from "@/components/sidebar";
 import { prisma } from "@/lib/prisma";
+import { isLoggedIn } from "@/lib/session";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,10 +34,21 @@ async function getActiveYearName() {
 }
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const fonts = `${geistSans.variable} ${geistMono.variable}`;
+
+  // signed out: just the page (the login form), no sidebar and no database call
+  if (!(await isLoggedIn())) {
+    return (
+      <html lang="en" className={fonts}>
+        <body className="min-h-screen">{children}</body>
+      </html>
+    );
+  }
+
   const activeYear = await getActiveYearName();
 
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+    <html lang="en" className={fonts}>
       <body className="min-h-screen">
         <Sidebar activeYear={activeYear} />
         <main className="md:pl-60">
