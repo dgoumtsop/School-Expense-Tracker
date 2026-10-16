@@ -1,4 +1,4 @@
-// values match the PaymentMethod enum in schema.prisma
+
 export const PAYMENT_METHODS = [
   { value: "CASH", label: "Cash" },
   { value: "BANK_TRANSFER", label: "Bank transfer" },

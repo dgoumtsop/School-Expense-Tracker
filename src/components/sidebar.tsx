@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { logout } from "@/app/login/actions";
 
 const GROUPS = [
   { title: null, links: [{ href: "/", label: "Overview" }] },
@@ -86,6 +87,15 @@ export function Sidebar({ activeYear }: { activeYear: string | null }) {
             </ul>
           </div>
         ))}
+
+        <form action={logout} className="border-t border-white/10 pt-3">
+          <button
+            type="submit"
+            className="w-full rounded-md px-3 py-2 text-left text-sm text-white/75 transition-colors hover:bg-white/10 hover:text-white"
+          >
+            Sign out
+          </button>
+        </form>
       </nav>
     </div>
   );
