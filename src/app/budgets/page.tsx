@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { PageHeader } from "@/components/page-header";
 import { ProgressBar, StatusBadge } from "@/components/budget-meter";
 import { budgetUsage } from "@/lib/budget-status";
+import { monthWindow } from "@/lib/budget";
 import { fcfa } from "@/lib/format";
 import { setBudget } from "./actions";
 
@@ -33,6 +34,23 @@ export default async function BudgetsPage() {
   // turn the rows into a lookup: categoryId -> total spent
   const spentByCategory = new Map(
     spentRows.map((r) => [r.categoryId, r._sum.amount ?? 0])
+  );
+
+  // monthly budgets are measured against the current month only
+  const now = new Date();
+  const { start, end } = monthWindow(now);
+  const monthName = now.toLocaleDateString("en-US", { month: "long", timeZone: "UTC" });
+  const monthRows = await prisma.expense.groupBy({
+    by: ["categoryId"],
+    where: {
+      status: "ACTIVE",
+      schoolYear: { isActive: true },
+      date: { gte: start, lt: end },
+    },
+    _sum: { amount: true },
+  });
+  const spentThisMonth = new Map(
+    monthRows.map((r) => [r.categoryId, r._sum.amount ?? 0])
   );
 
   // categories that have spending but no budget row, they'd be invisible otherwise
@@ -74,6 +92,13 @@ export default async function BudgetsPage() {
               ))}
             </select>
           </div>
+          <div className="w-full sm:w-36">
+            <label htmlFor="budget-period" className="label">Period</label>
+            <select id="budget-period" name="period" defaultValue="YEARLY" className="field">
+              <option value="YEARLY">Yearly</option>
+              <option value="MONTHLY">Monthly</option>
+            </select>
+          </div>
           <div className="w-full sm:w-56">
             <label htmlFor="budget-amount" className="label">Budget (FCFA)</label>
             <input
@@ -87,6 +112,9 @@ export default async function BudgetsPage() {
             />
           </div>
           <button type="submit" className="btn btn-primary">Set budget</button>
+          <p className="w-full text-sm text-muted">
+            Yearly is one amount for the whole school year. Monthly is the amount for each month.
+          </p>
         </form>
       )}
 
@@ -110,20 +138,33 @@ export default async function BudgetsPage() {
               </tr>
             )}
             {budgets.map((b) => {
-              const spent = spentByCategory.get(b.categoryId) ?? 0;
+              const monthly = b.period === "MONTHLY";
+              // monthly budgets compare this month's spending, yearly ones the whole year
+              const spent =
+                (monthly ? spentThisMonth : spentByCategory).get(b.categoryId) ?? 0;
               const { percent, tone, label } = budgetUsage(spent, b.amount);
 
               return (
                 <tr key={b.id}>
                   <td>
                     <span className="font-medium">{b.category.name}</span>
+                    {monthly && (
+                      <span className="badge ml-2 bg-indigo-50 text-indigo-800">Monthly</span>
+                    )}
                     {/* on a phone the two amount columns are hidden, so show them here */}
                     <span className="block text-xs tabular-nums text-muted sm:hidden">
                       {fcfa(spent)} of {fcfa(b.amount)}
+                      {monthly ? ` per month (${monthName})` : ""}
                     </span>
                   </td>
-                  <td className="num hidden sm:table-cell">{fcfa(b.amount)}</td>
-                  <td className="num hidden sm:table-cell">{fcfa(spent)}</td>
+                  <td className="num hidden sm:table-cell">
+                    {fcfa(b.amount)}
+                    {monthly && <span className="block text-xs text-muted">per month</span>}
+                  </td>
+                  <td className="num hidden sm:table-cell">
+                    {fcfa(spent)}
+                    {monthly && <span className="block text-xs text-muted">in {monthName}</span>}
+                  </td>
                   <td>
                     <div className="flex items-center gap-3">
                       <div className="grow">

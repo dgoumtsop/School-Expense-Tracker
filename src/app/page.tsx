@@ -5,6 +5,7 @@ import { ProgressBar, StatusBadge } from "@/components/budget-meter";
 import { BudgetRing } from "@/components/budget-ring";
 import { SpendingChart, type SpendingPoint } from "@/components/spending-chart";
 import { budgetUsage } from "@/lib/budget-status";
+import { monthWindow } from "@/lib/budget";
 import { fcfa, isoDate } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
@@ -30,7 +31,12 @@ export default async function OverviewPage() {
     );
   }
 
-  const [budgets, spentRows, recent, dated, categories] = await Promise.all([
+  // monthly budgets are checked against the current month only
+  const now = new Date();
+  const { start, end } = monthWindow(now);
+  const monthName = now.toLocaleDateString("en-US", { month: "long", timeZone: "UTC" });
+
+  const [budgets, spentRows, recent, dated, categories, monthRows] = await Promise.all([
     prisma.budget.findMany({
       where: { schoolYearId: year.id },
       include: { category: true },
@@ -53,13 +59,26 @@ export default async function OverviewPage() {
       orderBy: { date: "asc" },
     }),
     prisma.category.findMany({ select: { id: true, name: true } }),
+    prisma.expense.groupBy({
+      by: ["categoryId"],
+      where: { status: "ACTIVE", schoolYearId: year.id, date: { gte: start, lt: end } },
+      _sum: { amount: true },
+    }),
   ]);
 
   const spentByCategory = new Map(
     spentRows.map((r) => [r.categoryId, r._sum.amount ?? 0])
   );
 
-  const budgeted = budgets.reduce((sum, b) => sum + b.amount, 0);
+  const spentThisMonth = new Map(
+    monthRows.map((r) => [r.categoryId, r._sum.amount ?? 0])
+  );
+
+  // a monthly budget counts as 12 months in the year's total
+  const budgeted = budgets.reduce(
+    (sum, b) => sum + (b.period === "MONTHLY" ? b.amount * 12 : b.amount),
+    0
+  );
   // remaining only compares budgets with what was spent in those same categories
   const spentInBudgets = budgets.reduce(
     (sum, b) => sum + (spentByCategory.get(b.categoryId) ?? 0),
@@ -72,8 +91,10 @@ export default async function OverviewPage() {
   // categories at 80% or more, closest to the limit first
   const attention = budgets
     .map((b) => {
-      const spent = spentByCategory.get(b.categoryId) ?? 0;
-      return { b, spent, ...budgetUsage(spent, b.amount) };
+      const monthly = b.period === "MONTHLY";
+      // monthly budgets are judged on this month, yearly ones on the whole year
+      const spent = (monthly ? spentThisMonth : spentByCategory).get(b.categoryId) ?? 0;
+      return { b, monthly, spent, ...budgetUsage(spent, b.amount) };
     })
     .filter((x) => x.tone !== "ok")
     .sort((a, z) => z.percent - a.percent);
@@ -190,14 +211,15 @@ export default async function OverviewPage() {
             </div>
           ) : (
             <div className="panel divide-y divide-line">
-              {attention.map(({ b, spent, percent, tone, label }) => (
+              {attention.map(({ b, monthly, spent, percent, tone, label }) => (
                 <div key={b.id} className="p-4">
                   <div className="flex items-baseline justify-between gap-3">
                     <p className="font-medium">{b.category.name}</p>
                     <StatusBadge tone={tone} label={label} />
                   </div>
                   <p className="mb-2 text-sm tabular-nums text-muted">
-                    {fcfa(spent)} of {fcfa(b.amount)} FCFA ({percent}%)
+                    {fcfa(spent)} of {fcfa(b.amount)} FCFA{" "}
+                    {monthly ? `per month, in ${monthName}` : ""} ({percent}%)
                   </p>
                   <ProgressBar percent={percent} tone={tone} />
                 </div>
