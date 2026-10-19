@@ -38,16 +38,19 @@ export function BudgetRing({
           stroke="var(--color-line)"
           strokeWidth={stroke}
         />
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={r}
-          fill="none"
-          stroke={STROKE[tone]}
-          strokeWidth={stroke}
-          strokeLinecap="round"
-          strokeDasharray={`${circumference * filled} ${circumference}`}
-        />
+        {/* at 0% a round line cap would still draw a dot, so draw nothing */}
+        {filled > 0 && (
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={r}
+            fill="none"
+            stroke={STROKE[tone]}
+            strokeWidth={stroke}
+            strokeLinecap="round"
+            strokeDasharray={`${circumference * filled} ${circumference}`}
+          />
+        )}
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
         <span className="text-3xl font-semibold tabular-nums">{percent}%</span>

@@ -43,7 +43,12 @@ export default async function ReportsPage({ searchParams }: { searchParams: Sear
     new URLSearchParams({ view, group: grouping, from: isoDate(from), to: isoDate(to), ...patch }).toString();
   const viewLabel = REPORT_VIEWS.find((v) => v.value === view)!.label;
   const groupLabel = GROUPINGS.find((g) => g.value === grouping)!.label;
-  const title = view === "period" ? `${groupLabel} statement` : `Statement ${viewLabel.toLowerCase()}`;
+  const title =
+    view === "period"
+      ? `${groupLabel} statement`
+      : view === "budget"
+        ? "Budget vs actual statement"
+        : `Statement ${viewLabel.toLowerCase()}`;
   const statusColumn = view === "budget" ? table.columns.length - 1 : -1;
 
   const figures = [
