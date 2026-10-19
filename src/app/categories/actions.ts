@@ -2,8 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { requireLogin } from "@/lib/session";
 
 export async function createCategory(formData: FormData) {
+  await requireLogin();
   // form values come in as strings or null, so clean it up first
   const name = String(formData.get("name") ?? "").trim();
   if (!name) return;
@@ -19,6 +21,7 @@ export async function createCategory(formData: FormData) {
 }
 
 export async function archiveCategory(formData: FormData) {
+  await requireLogin();
   const id = Number(formData.get("id"));
   if (!id) return;
 

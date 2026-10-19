@@ -2,8 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { requireLogin } from "@/lib/session";
 
 export async function createSchoolYear(formData: FormData) {
+  await requireLogin();
   const name = String(formData.get("name") ?? "").trim();
   if (!name) return;
 
@@ -16,6 +18,7 @@ export async function createSchoolYear(formData: FormData) {
 }
 
 export async function setActiveYear(formData: FormData) {
+  await requireLogin();
   const id = Number(formData.get("id"));
   if (!id) return;
 

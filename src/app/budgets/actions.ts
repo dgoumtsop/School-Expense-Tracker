@@ -2,8 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { requireLogin } from "@/lib/session";
 
 export async function setBudget(formData: FormData) {
+  await requireLogin();
   const categoryId = Number(formData.get("categoryId"));
   const amount = Math.round(Number(formData.get("amount")));
   if (!categoryId || !(amount > 0)) return;

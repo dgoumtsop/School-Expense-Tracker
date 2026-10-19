@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { requireLogin } from "@/lib/session";
 import { getBudgetImpact } from "@/lib/budget";
 import type { FormState } from "@/lib/form-state";
 import { PAYMENT_METHODS, type PaymentMethodValue } from "@/lib/payment-methods";
@@ -59,6 +60,7 @@ export async function createExpense(
   _prev: FormState,
   formData: FormData
 ): Promise<FormState> {
+  await requireLogin();
   const parsed = parseExpense(formData);
   if ("error" in parsed) return { error: parsed.error };
 
@@ -97,6 +99,7 @@ export async function updateExpense(
   _prev: FormState,
   formData: FormData
 ): Promise<FormState> {
+  await requireLogin();
   const id = Number(formData.get("id"));
   const existing = id ? await prisma.expense.findUnique({ where: { id } }) : null;
   if (!existing) return { error: "Expense not found." };
@@ -128,6 +131,7 @@ export async function updateExpense(
 }
 
 export async function cancelExpense(formData: FormData) {
+  await requireLogin();
   const id = Number(formData.get("id"));
   if (!id) return;
 
