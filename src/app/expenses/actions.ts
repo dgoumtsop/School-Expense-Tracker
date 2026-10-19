@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireLogin } from "@/lib/session";
-import { getBudgetImpact } from "@/lib/budget";
+import { MAX_AMOUNT, getBudgetImpact } from "@/lib/budget";
 import type { FormState } from "@/lib/form-state";
 import { PAYMENT_METHODS, type PaymentMethodValue } from "@/lib/payment-methods";
 
@@ -21,6 +21,9 @@ function parseExpense(formData: FormData) {
 
   if (isNaN(date.getTime())) return { error: "Pick a valid date." };
   if (!(amount > 0)) return { error: "Amount must be greater than 0." };
+  if (amount > MAX_AMOUNT) {
+    return { error: `Amount can't be more than ${MAX_AMOUNT.toLocaleString("en-US")} FCFA.` };
+  }
   if (!categoryId) return { error: "Choose a category." };
   if (!accountId) return { error: "Choose an account." };
   if (!PAYMENT_METHODS.some((m) => m.value === method)) {

@@ -77,6 +77,7 @@ export function ExpenseForm({
           name="amount"
           type="number"
           min="1"
+          max="2147483647"
           required
           placeholder="e.g. 50000"
           defaultValue={initial?.amount}

@@ -1,5 +1,8 @@
 import { prisma } from "@/lib/prisma";
 
+// amounts are a Postgres INTEGER column, anything bigger makes the insert fail
+export const MAX_AMOUNT = 2_147_483_647;
+
 // first day of the expense's month and first day of the next one, in UTC
 // (dates are saved as UTC midnight, so UTC keeps the 1st and the 31st in the right month)
 export function monthWindow(date: Date) {

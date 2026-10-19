@@ -106,6 +106,7 @@ export default async function BudgetsPage() {
               name="amount"
               type="number"
               min="1"
+              max="2147483647"
               required
               placeholder="e.g. 600000"
               className="field"
