@@ -139,8 +139,9 @@ export async function cancelExpense(formData: FormData) {
   if (!id) return;
 
   // soft delete: the row stays for history, but stops counting toward totals
-  await prisma.expense.update({
-    where: { id },
+  // only active ones, so a second click doesn't overwrite the original cancel date
+  await prisma.expense.updateMany({
+    where: { id, status: "ACTIVE" },
     data: { status: "CANCELLED", cancelledAt: new Date() },
   });
 
