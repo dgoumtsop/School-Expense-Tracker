@@ -1,18 +1,34 @@
 @import "tailwindcss";
 
-/* fonts come from layout.tsx (Geist), colors are the whole palette of the app */
+/* fonts come from layout.tsx (Plus Jakarta Sans, Geist Mono), colors are the whole palette of the app */
 @theme inline {
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
+/* light palette, dark values are swapped in below. pages only use these names */
 @theme {
-  --color-ink: #1e1b4b;
-  --color-paper: #f7f7fb;
-  --color-line: #e2e2ec;
-  --color-muted: #5b5b76;
-  --color-accent: #4f46e5;
-  --color-accent-strong: #4338ca;
+  --color-paper: #f3f8f6; /* page background, soft mint white */
+  --color-surface: #ffffff; /* cards, inputs */
+  --color-ink: #12302a; /* text, deep green-black */
+  --color-muted: #5a706a;
+  --color-line: #dce8e3;
+  --color-accent: #0f9f7f; /* emerald teal, buttons and links */
+  --color-accent-strong: #0b7f66;
+  --color-accent-soft: #ddf3ec;
+  --color-on-accent: #ffffff;
+  --color-highlight: #f5a524; /* warm amber */
+
+  /* budget states: a fill color, a soft background and a readable text color */
+  --color-good: #12a150;
+  --color-good-soft: #e1f6e9;
+  --color-good-ink: #0b6b37;
+  --color-warn: #f5a524;
+  --color-warn-soft: #fff1d6;
+  --color-warn-ink: #8a5300;
+  --color-bad: #e5484d;
+  --color-bad-soft: #fde7e7;
+  --color-bad-ink: #a3191e;
 }
 
 @layer base {
@@ -20,28 +36,85 @@
     color-scheme: light;
   }
 
+  @media screen and (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --color-paper: #0c1614;
+      --color-surface: #13211e;
+      --color-ink: #e4f1ec;
+      --color-muted: #93aaa3;
+      --color-line: #233630;
+      --color-accent: #2bc79f;
+      --color-accent-strong: #5ad8b7;
+      --color-accent-soft: #123a31;
+      --color-on-accent: #04201a;
+      --color-highlight: #f7b84a;
+      --color-good: #3dd68c;
+      --color-good-soft: #113424;
+      --color-good-ink: #7ee8b2;
+      --color-warn: #f7b84a;
+      --color-warn-soft: #3a2b0e;
+      --color-warn-ink: #ffd27f;
+      --color-bad: #ff6b6f;
+      --color-bad-soft: #3d191b;
+      --color-bad-ink: #ffa3a5;
+    }
+  }
+
   body {
-    @apply bg-paper text-ink antialiased;
+    @apply bg-paper font-sans text-ink antialiased;
+    /* a faint teal wash at the top so the page isn't one flat color */
+    background-image: radial-gradient(
+      ellipse 90% 320px at 60% -80px,
+      color-mix(in oklab, var(--color-accent) 12%, transparent),
+      transparent
+    );
+    background-repeat: no-repeat;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+    letter-spacing: -0.015em;
   }
 
   :focus-visible {
     outline: 2px solid var(--color-accent);
     outline-offset: 2px;
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      transition: none !important;
+    }
+  }
 }
 
 /* small reusable pieces, pages just say className="btn btn-primary" etc. */
 @layer components {
   .panel {
-    @apply rounded-lg border border-line bg-white;
+    @apply rounded-2xl border border-line/70 bg-surface;
+    box-shadow:
+      0 1px 2px color-mix(in oklab, var(--color-ink) 5%, transparent),
+      0 8px 24px -12px color-mix(in oklab, var(--color-ink) 12%, transparent);
   }
 
   .label {
-    @apply mb-1 block text-sm font-medium;
+    @apply mb-1.5 block text-sm font-medium;
   }
 
   .field {
-    @apply h-10 w-full rounded-md border border-line bg-white px-3 text-sm text-ink shadow-sm;
+    @apply h-11 w-full rounded-xl border border-line bg-surface px-3.5 text-sm text-ink transition-colors;
+  }
+
+  .field:hover {
+    @apply border-accent/50;
+  }
+
+  .field:focus {
+    @apply border-accent outline-none;
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--color-accent) 18%, transparent);
   }
 
   .field::placeholder {
@@ -49,23 +122,28 @@
   }
 
   .btn {
-    @apply inline-flex cursor-pointer items-center justify-center rounded-md border px-3.5 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-50;
   }
 
   .btn-sm {
-    @apply px-2.5 py-1.5 text-xs;
+    @apply rounded-lg px-3 py-1.5 text-xs;
   }
 
   .btn-primary {
-    @apply border-accent bg-accent text-white hover:bg-accent-strong;
+    @apply border-accent bg-accent text-on-accent hover:border-accent-strong hover:bg-accent-strong;
+    box-shadow: 0 6px 16px -8px var(--color-accent);
+  }
+
+  .btn-primary:active {
+    transform: translateY(1px);
   }
 
   .btn-secondary {
-    @apply border-line bg-white text-ink hover:bg-paper;
+    @apply border-line bg-surface text-ink hover:border-accent/50 hover:bg-accent-soft;
   }
 
   .btn-danger {
-    @apply border-red-200 bg-white text-red-700 hover:bg-red-50;
+    @apply border-bad/30 bg-surface text-bad-ink hover:bg-bad-soft;
   }
 
   .table {
@@ -73,11 +151,19 @@
   }
 
   .table th {
-    @apply border-b border-line px-4 py-2.5 text-left font-medium text-muted;
+    @apply border-b border-line px-4 py-3 text-left text-xs font-semibold tracking-wide text-muted uppercase;
   }
 
   .table td {
-    @apply border-b border-line/70 px-4 py-3 align-middle;
+    @apply border-b border-line/60 px-4 py-3.5 align-middle;
+  }
+
+  .table tbody tr {
+    @apply transition-colors;
+  }
+
+  .table tbody tr:hover td {
+    @apply bg-paper/60;
   }
 
   .table tbody tr:last-child td {
@@ -92,6 +178,38 @@
   }
 
   .badge {
-    @apply inline-block rounded-full px-2.5 py-0.5 text-xs font-medium;
+    @apply inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold;
+  }
+
+  /* feedback boxes under forms */
+  .alert {
+    @apply rounded-xl px-3.5 py-2.5 text-sm;
+  }
+  .alert-error {
+    @apply bg-bad-soft text-bad-ink;
+  }
+  .alert-success {
+    @apply bg-good-soft text-good-ink;
+  }
+  .alert-warning {
+    @apply bg-warn-soft text-warn-ink;
+  }
+}
+
+/* printed statements: no menu, no shadows, black on white, rows never split across pages */
+@media print {
+  @page {
+    margin: 14mm;
+  }
+  body {
+    background: none;
+    font-size: 11pt;
+  }
+  .panel {
+    box-shadow: none;
+    break-inside: avoid;
+  }
+  .table tr {
+    break-inside: avoid;
   }
 }

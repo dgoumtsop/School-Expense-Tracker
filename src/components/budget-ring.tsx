@@ -1,9 +1,9 @@
 import type { BudgetTone } from "@/lib/budget-status";
 
 const STROKE: Record<BudgetTone, string> = {
-  ok: "#059669",
-  warn: "#f59e0b",
-  over: "#dc2626",
+  ok: "var(--color-good)",
+  warn: "var(--color-warn)",
+  over: "var(--color-bad)",
 };
 
 // ring that fills as the year's budget gets used, past 100% it stays full and turns red

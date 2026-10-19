@@ -154,15 +154,15 @@ export function ExpenseForm({
       {(state.error || state.success || state.warning) && (
         <div className="md:col-span-2" role="status" aria-live="polite">
           {state.error && (
-            <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-800">{state.error}</p>
+            <p className="alert alert-error">{state.error}</p>
           )}
           {state.success && (
-            <p className="rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
+            <p className="alert alert-success">
               {state.success}
             </p>
           )}
           {state.warning && (
-            <p className="rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-900">
+            <p className="alert alert-warning">
               {state.warning}
             </p>
           )}

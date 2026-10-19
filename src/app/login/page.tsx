@@ -10,7 +10,7 @@ export default async function LoginPage() {
 
   return (
     <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center px-5">
-      <h1 className="text-2xl font-semibold tracking-tight">School Expense Manager</h1>
+      <h1 className="text-3xl font-bold tracking-tight">School Expense Manager</h1>
       <p className="mt-1 text-sm text-muted">Enter the password to continue.</p>
       <LoginForm />
     </main>

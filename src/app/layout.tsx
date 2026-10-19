@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { Sidebar } from "@/components/sidebar";
 import { prisma } from "@/lib/prisma";
 import { isLoggedIn } from "@/lib/session";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const jakarta = Plus_Jakarta_Sans({
+  variable: "--font-jakarta",
   subsets: ["latin"],
 });
 
@@ -34,7 +34,7 @@ async function getActiveYearName() {
 }
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
-  const fonts = `${geistSans.variable} ${geistMono.variable}`;
+  const fonts = `${jakarta.variable} ${geistMono.variable}`;
 
   // signed out: just the page (the login form), no sidebar and no database call
   if (!(await isLoggedIn())) {
@@ -51,8 +51,8 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en" className={fonts}>
       <body className="min-h-screen">
         <Sidebar activeYear={activeYear} />
-        <main className="md:pl-60">
-          <div className="mx-auto max-w-5xl px-5 py-8 md:px-10">{children}</div>
+        <main className="md:pl-64 print:pl-0">
+          <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 md:px-10 md:py-10">{children}</div>
         </main>
       </body>
     </html>

@@ -86,7 +86,7 @@ export function SpendingChart({
       {area && <path d={area} fill="var(--color-accent)" fillOpacity="0.1" />}
       <path d={line} fill="none" stroke="var(--color-accent)" strokeWidth="2.5" strokeLinejoin="round" />
       {spentPoints.map((p, i) => (
-        <circle key={p.label} cx={x(i)} cy={y(p.cumulative)} r="3.5" fill="white" stroke="var(--color-accent)" strokeWidth="2">
+        <circle key={p.label} cx={x(i)} cy={y(p.cumulative)} r="3.5" fill="var(--color-surface)" stroke="var(--color-accent)" strokeWidth="2">
           <title>{`${p.label}: ${fcfa(p.total)} FCFA this month, ${fcfa(p.cumulative)} FCFA in total`}</title>
         </circle>
       ))}

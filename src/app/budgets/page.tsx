@@ -150,7 +150,7 @@ export default async function BudgetsPage() {
                   <td>
                     <span className="font-medium">{b.category.name}</span>
                     {monthly && (
-                      <span className="badge ml-2 bg-indigo-50 text-indigo-800">Monthly</span>
+                      <span className="badge ml-2 bg-accent-soft text-accent-strong">Monthly</span>
                     )}
                     {/* on a phone the two amount columns are hidden, so show them here */}
                     <span className="block text-xs tabular-nums text-muted sm:hidden">

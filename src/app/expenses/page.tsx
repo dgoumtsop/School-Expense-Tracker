@@ -219,7 +219,7 @@ export default async function ExpensesPage({ searchParams }: { searchParams: Sea
                     </td>
                     <td className="whitespace-nowrap text-right">
                       {cancelled ? (
-                        <span className="badge bg-slate-100 text-slate-700">
+                        <span className="badge bg-paper text-muted">
                           Cancelled {e.cancelledAt ? isoDate(e.cancelledAt) : ""}
                         </span>
                       ) : (

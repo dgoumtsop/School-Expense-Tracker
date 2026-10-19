@@ -34,22 +34,34 @@ export function Sidebar({ activeYear }: { activeYear: string | null }) {
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 
   return (
-    <div className="bg-ink text-white md:fixed md:inset-y-0 md:left-0 md:flex md:w-60 md:flex-col">
-      <div className="flex items-center justify-between px-5 py-4 md:block md:py-6">
-        <div>
-          <p className="text-base font-semibold leading-tight">School Expense Manager</p>
-          <Link
-            href="/school-years"
-            className={`mt-1 inline-block text-sm hover:text-white ${
-              activeYear ? "text-indigo-200" : "text-amber-300"
-            }`}
+    <div className="sticky top-0 z-20 print:hidden border-b border-line bg-surface/90 backdrop-blur md:fixed md:inset-y-0 md:left-0 md:flex md:w-64 md:flex-col md:border-r md:border-b-0 md:bg-surface">
+      <div className="flex items-center justify-between gap-3 px-5 py-3.5 md:block md:px-6 md:py-7">
+        <div className="flex items-center gap-3">
+          <span
+            aria-hidden
+            className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent text-lg font-bold text-on-accent shadow-md shadow-accent/30"
           >
-            {activeYear ? `School year ${activeYear}` : "No active school year"}
-          </Link>
+            S
+          </span>
+          <div className="min-w-0">
+            <p className="text-[15px] font-bold leading-tight">School Expenses</p>
+            <Link
+              href="/school-years"
+              className={`mt-0.5 inline-flex items-center gap-1.5 text-xs font-medium hover:underline ${
+                activeYear ? "text-accent-strong" : "text-warn-ink"
+              }`}
+            >
+              <span
+                aria-hidden
+                className={`size-1.5 rounded-full ${activeYear ? "bg-good" : "bg-warn"}`}
+              />
+              {activeYear ? `School year ${activeYear}` : "No active school year"}
+            </Link>
+          </div>
         </div>
         <button
           type="button"
-          className="rounded-md border border-white/25 px-3 py-1.5 text-sm md:hidden"
+          className="rounded-xl border border-line px-3.5 py-1.5 text-sm font-medium md:hidden"
           aria-expanded={open}
           aria-controls="main-nav"
           onClick={() => setOpen((o) => !o)}
@@ -60,24 +72,26 @@ export function Sidebar({ activeYear }: { activeYear: string | null }) {
 
       <nav
         id="main-nav"
-        className={`${open ? "block" : "hidden"} px-3 pb-4 md:block md:flex-1 md:overflow-y-auto`}
+        className={`${open ? "block" : "hidden"} px-3 pb-4 md:block md:flex-1 md:overflow-y-auto md:px-4`}
       >
         {GROUPS.map((group, i) => (
-          <div key={i} className="mb-4">
+          <div key={i} className="mb-5">
             {group.title && (
-              <p className="mb-1 px-3 text-xs text-white/50">{group.title}</p>
+              <p className="mb-1.5 px-3 text-[11px] font-semibold tracking-wider text-muted uppercase">
+                {group.title}
+              </p>
             )}
-            <ul className="space-y-0.5">
+            <ul className="space-y-1">
               {group.links.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
                     onClick={() => setOpen(false)}
                     aria-current={isActive(link.href) ? "page" : undefined}
-                    className={`block rounded-md px-3 py-2 text-sm transition-colors ${
+                    className={`block rounded-xl px-3 py-2.5 text-sm transition-colors ${
                       isActive(link.href)
-                        ? "bg-white/15 font-medium text-white"
-                        : "text-white/75 hover:bg-white/10 hover:text-white"
+                        ? "bg-accent-soft font-semibold text-accent-strong"
+                        : "font-medium text-muted hover:bg-paper hover:text-ink"
                     }`}
                   >
                     {link.label}
@@ -88,10 +102,10 @@ export function Sidebar({ activeYear }: { activeYear: string | null }) {
           </div>
         ))}
 
-        <form action={logout} className="border-t border-white/10 pt-3">
+        <form action={logout} className="border-t border-line pt-3">
           <button
             type="submit"
-            className="w-full rounded-md px-3 py-2 text-left text-sm text-white/75 transition-colors hover:bg-white/10 hover:text-white"
+            className="w-full rounded-xl px-3 py-2.5 text-left text-sm font-medium text-muted transition-colors hover:bg-bad-soft hover:text-bad-ink"
           >
             Sign out
           </button>

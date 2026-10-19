@@ -160,7 +160,7 @@ export default async function OverviewPage() {
               <p className="text-sm text-muted">{f.label}</p>
               <p
                 className={`mt-1 text-2xl font-semibold tabular-nums ${
-                  f.danger ? "text-red-700" : ""
+                  f.danger ? "text-bad-ink" : ""
                 }`}
               >
                 {fcfa(f.value)}

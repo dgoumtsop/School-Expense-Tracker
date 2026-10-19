@@ -1,15 +1,15 @@
 import type { BudgetTone } from "@/lib/budget-status";
 
 const FILL: Record<BudgetTone, string> = {
-  ok: "bg-emerald-600",
-  warn: "bg-amber-500",
-  over: "bg-red-600",
+  ok: "bg-good",
+  warn: "bg-warn-soft0",
+  over: "bg-bad",
 };
 
 const BADGE: Record<BudgetTone, string> = {
-  ok: "bg-emerald-50 text-emerald-800",
-  warn: "bg-amber-50 text-amber-900",
-  over: "bg-red-50 text-red-800",
+  ok: "bg-good-soft text-good-ink",
+  warn: "bg-warn-soft text-warn-ink",
+  over: "bg-bad-soft text-bad-ink",
 };
 
 // bar fills up to 100%, the thin mark sits on the 80% warning line

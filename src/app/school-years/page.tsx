@@ -50,7 +50,7 @@ export default async function SchoolYearsPage() {
                 <td className="font-medium">{y.name}</td>
                 <td>
                   {y.isActive ? (
-                    <span className="badge bg-indigo-50 text-indigo-800">Active</span>
+                    <span className="badge bg-accent-soft text-accent-strong">Active</span>
                   ) : (
                     <span className="text-muted">Inactive</span>
                   )}
