@@ -18,11 +18,18 @@ export default async function EditExpensePage({
   const expense = await prisma.expense.findUnique({ where: { id: Number(id) } });
   if (!expense || expense.status === "CANCELLED") notFound();
 
+  // keep the expense's own category, account and supplier in the lists even if they were
+  // archived since, otherwise the select falls back to the first option and saving changes it
+  const keep = (id: number | null) =>
+    id ? { OR: [{ isArchived: false }, { id }] } : { isArchived: false };
+  const label = (rows: { id: number; name: string; isArchived: boolean }[]) =>
+    rows.map((r) => ({ id: r.id, name: r.isArchived ? `${r.name} (archived)` : r.name }));
+
   const [categories, accounts, suppliers] = await Promise.all([
-    prisma.category.findMany({ where: { isArchived: false }, orderBy: { name: "asc" } }),
-    prisma.account.findMany({ where: { isArchived: false }, orderBy: { name: "asc" } }),
-    prisma.supplier.findMany({ where: { isArchived: false }, orderBy: { name: "asc" } }),
-  ]);
+    prisma.category.findMany({ where: keep(expense.categoryId), orderBy: { name: "asc" } }),
+    prisma.account.findMany({ where: keep(expense.accountId), orderBy: { name: "asc" } }),
+    prisma.supplier.findMany({ where: keep(expense.supplierId), orderBy: { name: "asc" } }),
+  ]).then((lists) => lists.map(label));
 
   return (
     <>
