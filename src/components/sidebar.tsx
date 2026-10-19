@@ -12,6 +12,7 @@ const GROUPS = [
     links: [
       { href: "/expenses", label: "Expenses" },
       { href: "/budgets", label: "Budgets" },
+      { href: "/reports", label: "Reports" },
     ],
   },
   {
