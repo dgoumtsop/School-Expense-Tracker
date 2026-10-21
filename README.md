@@ -108,19 +108,20 @@ npm run dev
 
 One-time setup:
 
-1. **Neon** (neon.tech): create a project in the **AWS Europe Central 1 (Frankfurt)** region. From its connection details, copy two connection strings:
-   - the **pooled** one (host contains `-pooler`): used by the app
-   - the **direct** one (no `-pooler`): used for migrations and backups
-2. **Vercel** (vercel.com): import the GitHub repository. Before the first deploy, add these environment variables (Project > Settings > Environment Variables):
+1. **Vercel** (vercel.com): import the GitHub repository.
+2. **Database**: in the Vercel project, open **Storage > Create Database > Neon**, pick the **Frankfurt (eu-central-1)** region and connect it to the project. This adds the connection variables for you:
+   - `DATABASE_URL`: the **pooled** connection (host contains `-pooler`), used by the app
+   - `DATABASE_URL_UNPOOLED`: the **direct** connection, used for migrations and backups
+
+   (Using a Neon account directly instead works too: set `DATABASE_URL` to the pooled string and `DIRECT_URL` to the direct one.)
+3. Add the two app settings (Project > Settings > Environment Variables):
 
    | Name | Value |
    |---|---|
-   | `DATABASE_URL` | Neon pooled connection string |
-   | `DIRECT_URL` | Neon direct connection string |
    | `ADMIN_PASSWORD` | a long password, different from the local one |
    | `AUTH_SECRET` | a new random string (command above), never the local one |
 
-3. Deploy. Vercel runs `npm run vercel-build`, which applies any pending migrations (`prisma migrate deploy`) and then builds the app. `vercel.json` pins the app to Frankfurt (`fra1`), next to the database.
+4. Deploy. Vercel runs `npm run vercel-build`, which applies any pending migrations (`prisma migrate deploy`) and then builds the app. `vercel.json` pins the app to Frankfurt (`fra1`), next to the database.
 
 After that, every push to `main` deploys automatically. Schema changes ship the same way: create a migration locally with `npx prisma migrate dev --name what-changed`, commit it, push.
 
@@ -131,7 +132,7 @@ Changing the password: edit `ADMIN_PASSWORD` in Vercel, then redeploy. Signing e
 `.github/workflows/backup.yml` dumps the Neon database every Monday at 03:00 UTC, encrypts it, and keeps it for 90 days as a workflow artifact. It can also be run by hand (Actions > Database backup > Run workflow).
 
 Setup: add two repository secrets (Settings > Secrets and variables > Actions):
-- `DIRECT_URL`: the Neon direct connection string
+- `DIRECT_URL`: the Neon direct connection string (the value of `DATABASE_URL_UNPOOLED` in Vercel)
 - `BACKUP_PASSPHRASE`: a long passphrase. Store it in a password manager; without it a backup can't be opened.
 
 Note: GitHub pauses scheduled workflows in a repository with no activity for 60 days. If that happens, re-enable it on the Actions tab.

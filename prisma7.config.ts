@@ -10,7 +10,11 @@ export default defineConfig({
   },
   datasource: {
     // migrations need a direct connection, Neon's pooled one (DATABASE_URL, used by the app) can't run them.
+    // DATABASE_URL_UNPOOLED is the name Vercel's Neon integration gives the direct one.
     // locally there is only DATABASE_URL, so it falls back to that
-    url: process.env["DIRECT_URL"] ?? process.env["DATABASE_URL"],
+    url:
+      process.env["DIRECT_URL"] ??
+      process.env["DATABASE_URL_UNPOOLED"] ??
+      process.env["DATABASE_URL"],
   },
 });

@@ -2,7 +2,7 @@
 # The dump is encrypted, because artifacts of a public repo can be downloaded by other GitHub users.
 #
 # Needs two repository secrets (Settings > Secrets and variables > Actions):
-#   DIRECT_URL          Neon's direct (not pooled) connection string
+#   DIRECT_URL          Neon's direct (not pooled) connection string, DATABASE_URL_UNPOOLED in Vercel
 #   BACKUP_PASSPHRASE   any long passphrase, keep it somewhere safe: without it a backup can't be opened
 #
 # Restore: see "Backups" in the README.
