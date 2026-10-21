@@ -3,18 +3,31 @@
 import "dotenv/config";
 import { defineConfig } from "prisma/config";
 
+// migrations need a direct connection, Neon's pooled one (DATABASE_URL, used by the app) can't run them.
+// DATABASE_URL_UNPOOLED is the name Vercel's Neon integration gives the direct one.
+// locally there is only DATABASE_URL, so it falls back to that
+const source = ["DIRECT_URL", "DATABASE_URL_UNPOOLED", "DATABASE_URL"].find((name) => process.env[name]);
+const url = source ? process.env[source] : undefined;
+
+// a pasted value that isn't a connection string fails later with a vague P1013,
+// so say which variable it is and what's wrong, without printing the value (it holds the password)
+if (source && url && !/^postgres(ql)?:\/\//.test(url)) {
+  const hint = /^["']/.test(url)
+    ? "it starts with a quote, remove the quotes around it"
+    : /^\s/.test(url)
+      ? "it starts with a space or line break"
+      : /^psql\b/.test(url)
+        ? "it is the psql command, keep only the postgresql://... part"
+        : /^[A-Z_]+=/.test(url)
+          ? "it starts with a variable name and =, keep only the part after ="
+          : "it doesn't start with postgresql://";
+  throw new Error(`${source} is not a database connection string: ${hint} (length ${url.length}).`);
+}
+
 export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
   },
-  datasource: {
-    // migrations need a direct connection, Neon's pooled one (DATABASE_URL, used by the app) can't run them.
-    // DATABASE_URL_UNPOOLED is the name Vercel's Neon integration gives the direct one.
-    // locally there is only DATABASE_URL, so it falls back to that
-    url:
-      process.env["DIRECT_URL"] ??
-      process.env["DATABASE_URL_UNPOOLED"] ??
-      process.env["DATABASE_URL"],
-  },
+  datasource: { url },
 });
