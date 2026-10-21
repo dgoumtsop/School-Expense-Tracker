@@ -17,8 +17,13 @@ export async function login(_prev: FormState, formData: FormData): Promise<FormS
   const password = String(formData.get("password") ?? "");
   const expected = process.env.ADMIN_PASSWORD;
 
-  if (!expected || !process.env.AUTH_SECRET) {
-    return { error: "Login is not set up on the server yet." };
+  // name what's missing (never the values) so a setup mistake is quick to spot
+  const missing = [
+    !expected && "ADMIN_PASSWORD",
+    !process.env.AUTH_SECRET && "AUTH_SECRET",
+  ].filter(Boolean);
+  if (missing.length) {
+    return { error: `Login is not set up on the server yet: ${missing.join(" and ")} missing.` };
   }
   if (!samePassword(password, expected)) {
     return { error: "Wrong password." };
