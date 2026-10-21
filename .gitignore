@@ -42,3 +42,6 @@ next-env.d.ts
 
 /generated/prisma
 /generated
+# local AI assistant files, kept off GitHub
+CLAUDE.md
+/.claude/
