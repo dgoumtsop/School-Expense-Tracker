@@ -22,7 +22,7 @@ export async function login(_prev: FormState, formData: FormData): Promise<FormS
     !expected && "ADMIN_PASSWORD",
     !process.env.AUTH_SECRET && "AUTH_SECRET",
   ].filter(Boolean);
-  if (missing.length) {
+  if (missing.length || !expected) {
     return { error: `Login is not set up on the server yet: ${missing.join(" and ")} missing.` };
   }
   if (!samePassword(password, expected)) {
