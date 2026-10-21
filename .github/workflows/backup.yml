@@ -1,0 +1,52 @@
+# Weekly copy of the production database, kept 90 days as a workflow artifact.
+# The dump is encrypted, because artifacts of a public repo can be downloaded by other GitHub users.
+#
+# Needs two repository secrets (Settings > Secrets and variables > Actions):
+#   DIRECT_URL          Neon's direct (not pooled) connection string
+#   BACKUP_PASSPHRASE   any long passphrase, keep it somewhere safe: without it a backup can't be opened
+#
+# Restore: see "Backups" in the README.
+
+name: Database backup
+
+on:
+  schedule:
+    - cron: "0 3 * * 1" # Mondays 03:00 UTC
+  workflow_dispatch: {} # "Run workflow" button for a backup on demand
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check the secrets are set
+        env:
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+          BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          if [ -z "$DIRECT_URL" ] || [ -z "$BACKUP_PASSPHRASE" ]; then
+            echo "::error::Add the DIRECT_URL and BACKUP_PASSPHRASE repository secrets first."
+            exit 1
+          fi
+
+      - name: Dump and encrypt
+        env:
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+          BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          # pg_dump from the official image, a newer pg_dump can read any older server
+          docker run --rm -e DIRECT_URL postgres:17 \
+            sh -c 'pg_dump --format=custom --no-owner --no-privileges "$DIRECT_URL"' > backup.dump
+          test -s backup.dump
+          gpg --batch --yes --pinentry-mode loopback --passphrase "$BACKUP_PASSPHRASE" \
+            --symmetric --cipher-algo AES256 --output "expenses-$(date -u +%F).dump.gpg" backup.dump
+          rm backup.dump
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: db-backup
+          path: expenses-*.dump.gpg
+          retention-days: 90
+          if-no-files-found: error
