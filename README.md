@@ -2,7 +2,7 @@
 
 Expense management web app for a school: budgets per category, daily expense entry, and financial reports. Amounts are in FCFA and the UI is in English. Built for one person, signed in with a single password.
 
-> Status: V1 features complete. Built from the client spec (`Depenses_description.pdf`). Deployment (Vercel + Neon) is next.
+> Status: V1 live on Vercel + Neon, in demo testing. Built from the client spec (`Depenses_description.pdf`).
 
 ## Features
 
@@ -174,7 +174,7 @@ src/components/      sidebar, page header, budget bar and ring, spending chart
 - [x] Design pass: app shell, tables, progress bars, mobile layout, dark mode
 - [x] Reports: dashboard, statements, CSV export, print
 - [x] Login
-- [ ] Deployment on Vercel + Neon, backups running
+- [x] Deployment on Vercel + Neon, weekly encrypted backups
 - [ ] Polish: expense list CSV, form messages, rename and un-archive, date checks, login rate limit
 
 ## Not in V1
